@@ -1,0 +1,9 @@
+DATASET:
+  SIZE: 192
+
+MODEL:
+  NAME: cnn
+
+TRAIN:
+  LR: 0.1
+  EXP_NAME: cnn

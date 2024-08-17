@@ -1,0 +1,10 @@
+DATASET:
+  SIZE: 192
+
+MODEL:
+  NAME: vit
+  PATCH_SIZE: 16
+
+TRAIN:
+  LR: 0.1
+  EXP_NAME: vit

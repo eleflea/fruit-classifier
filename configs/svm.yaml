@@ -1,0 +1,9 @@
+DATASET:
+  SIZE: 192
+
+MODEL:
+  NAME: svm
+
+TRAIN:
+  LR: 0.001
+  EXP_NAME: svm

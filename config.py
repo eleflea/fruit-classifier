@@ -1,0 +1,32 @@
+from yacs.config import CfgNode as CN
+
+
+_C = CN()
+
+_C.SYS = CN()
+_C.SYS.DEVICE = 'cuda:1'
+
+_C.DATASET = CN()
+_C.DATASET.ROOT = '/home/eleflea/datasets/friuts'
+_C.DATASET.NUM_CLASSES = 15
+_C.DATASET.SIZE = 192
+_C.DATASET.TRAIN_RATIO = 0.7
+_C.DATASET.SEED = 104829403
+
+_C.MODEL = CN()
+_C.MODEL.NAME = 'cnn'
+_C.MODEL.PATCH_SIZE = 16
+
+_C.TRAIN = CN()
+_C.TRAIN.BATCH_SIZE = 256
+_C.TRAIN.NUM_WORKERS = 16
+_C.TRAIN.LR = 0.001
+_C.TRAIN.MOMENTUM = 0.9
+_C.TRAIN.EPOCHES = 10
+_C.TRAIN.EXP_NAME = 'cnn'
+
+_C.EVAL = CN()
+_C.EVAL.BATCH_SIZE = 512
+_C.EVAL.NUM_WORKERS = 8
+
+cfg = _C
