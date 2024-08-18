@@ -7,16 +7,25 @@ import torcheval.metrics.functional as MF
 
 import argparse
 import time
-import shutil
 import os
+from copy import deepcopy
 
 from config import cfg
 from models.models import MODELS
 import dataset
 
 
-def get_model(cfg):
+def get_model(cfg, loader):
     net: nn.Module = MODELS[cfg.MODEL.NAME](cfg.DATASET.NUM_CLASSES)
+    if cfg.MODEL.NAME == 'svm':
+        loader_iterator = iter(deepcopy(loader))
+        data = []
+        count = 0
+        while count <= cfg.MODEL.X_SIZE:
+            data.append(next(loader_iterator)[0])
+            count += cfg.TRAIN.BATCH_SIZE
+        net.set_x(torch.concat(data, dim=0)[:cfg.MODEL.X_SIZE])
+
     return net
 
 
@@ -81,16 +90,18 @@ def save_weights(net, cfg):
     torch.save(net.state_dict(), filename)
 
 
-def save_summary(summary, cfg):
-    filename = os.path.join('experiments', cfg.TRAIN.EXP_NAME, 'summary.pt')
-    torch.save(summary, filename)
+def save_history(history, cfg):
+    filename = os.path.join('experiments', cfg.TRAIN.EXP_NAME, 'history.pt')
+    torch.save(history, filename)
 
 
 def train(cfg):
     torch.manual_seed(cfg.DATASET.SEED)
     device = torch.device(cfg.SYS.DEVICE)
 
-    net = get_model(cfg)
+    train_loader, val_loader, trainval_loader = dataset.get_dataloaders()
+
+    net = get_model(cfg, train_loader)
 
     os.makedirs(os.path.join('experiments', cfg.TRAIN.EXP_NAME), exist_ok=True)
     save_config(cfg)
@@ -99,11 +110,10 @@ def train(cfg):
     net.to(device)
     criterion = nn.CrossEntropyLoss(reduction='mean')
     optimizer = optim.SGD(net.parameters(), lr=cfg.TRAIN.LR, momentum=cfg.TRAIN.MOMENTUM, weight_decay=0)
-    train_loader, val_loader, trainval_loader = dataset.get_dataloaders()
 
     start_time = time.time()
     best_acc = 0
-    summaries = []
+    history = []
 
     for epoch in range(cfg.TRAIN.EPOCHES):
         net.train()
@@ -131,11 +141,11 @@ def train(cfg):
             save_weights(net, cfg)
 
         train_summary = eval(net, trainval_loader, cfg, loss_criterion=criterion)
-        summaries.append({
+        history.append({
             'train': train_summary,
             'val': val_summary
         })
-        save_summary({'summary': summaries}, cfg)
+        save_history({'history': history}, cfg)
 
         train_acc = train_summary['acc']
         train_loss = train_summary['loss']

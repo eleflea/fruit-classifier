@@ -3,7 +3,8 @@ DATASET:
 
 MODEL:
   NAME: svm
+  X_SIZE: 512
 
 TRAIN:
-  LR: 0.001
+  LR: 0.0001
   EXP_NAME: svm

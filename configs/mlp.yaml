@@ -1,0 +1,9 @@
+DATASET:
+  SIZE: 192
+
+MODEL:
+  NAME: mlp
+
+TRAIN:
+  LR: 0.01
+  EXP_NAME: mlp
